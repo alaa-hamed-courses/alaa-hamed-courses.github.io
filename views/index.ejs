@@ -311,9 +311,9 @@
         console.log(101010, courseInfo, localStorage.getItem("active-lesson"));
 
         if(courseInfo.length > 0 && localStorage.getItem("active-lesson") >= 0) {
-            avOp = courseInfo[localStorage.getItem("active-lesson")][1]; // availableOptions
             console.log(202020);
             let writeAvailableOptions2 = setInterval(() => {
+                avOp = courseInfo[localStorage.getItem("active-lesson")][1]; // availableOptions
                 console.log(avOp, availableOptionsChilds, lessonsListChilds);
                 if(avOp.length > 0 && availableOptionsChilds.length > 0 && lessonsListChilds.length > 0) {
                     let options = ["تفريغ", "تشجير", "تفريغ وتشجير", "كتاب"];
