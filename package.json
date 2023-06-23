@@ -9,6 +9,7 @@
   },
   "scripts": {
     "start": "node app.js",
+    "build": "npm run build",
     "watch": "nodemon --ext js,ejs --ignore public"
   },
   "engines": {
