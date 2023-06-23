@@ -48,10 +48,6 @@ router.get("/all-courses", (req, res) => {
     res.render("courses", {courses: courses, playlistID: playlistID});
 });
 
-// router.get("/all-courses/:id", (req, res) => {
-//     console.log(req.params.id, 333333333);
-// })
-
 router.get("/all-courses/:id", (req, res) => {
     دورة = req.params.id;
     
@@ -86,7 +82,7 @@ router.get("/all-courses/:id", (req, res) => {
         
         // lessonInfo ==> [الخ ... "اسم الدرس", ["تفريغ", "كتاب"]]
         // console.log([names[15], pdf[52][1]], names[15] == pdf[52][1]); // عند ظهور مشاكل في اختلاف التسمية - اسم الملف
-        isError != 1? res.render("index", {n: names, p: pdf, lesInfo: JSON.stringify(lessonInfo), course: دورة, courses: courses, playlistID: playlistID}) : res.status(404).send(`
+        isError != 1? res.render("index", {lesInfo: JSON.stringify(lessonInfo), course: دورة, courses: courses, playlistID: playlistID}) : res.status(404).send(`
         <!DOCTYPE html>
         <html lang="en">
         <head>
