@@ -6,6 +6,7 @@ let path = require('path');
 let coursesPath = path.join(__dirname, `../public`);
 let coursesFilesPath;
 let playlistID = [];
+let isError = 0;
 
 let courses = [];
 fs.readdir(coursesPath, (err, folders) => {
@@ -53,26 +54,30 @@ router.get("/all-courses", (req, res) => {
 
 router.get("/all-courses/:id", (req, res) => {
     دورة = req.params.id;
-
+    console.log("window.href");
     let voicePath = path.join(__dirname, `../public/${دورة}/صوت`);
     let pdfPath = path.join(__dirname, `../public/${دورة}/تفريغ وتشجير`);
 
     let names = [];
     fs.readdir(voicePath, (err, files) => {
-        for(let i = 0; i < files.length; i++) {
-            let str = files[i];
-            str = right(str, str.length-5).split(".")[0];
-            names.push(str.trim());
-        }
+        if(files != undefined) {
+            for(let i = 0; i < files.length; i++) {
+                let str = files[i];
+                str = right(str, str.length-5).split(".")[0];
+                names.push(str.trim());
+            }
+        } else {isError = 1;}
     });
     
     let pdf = [];
     fs.readdir(pdfPath, (err, files) => {
-        for(let i = 0; i < files.length; i++) {
-            let str = files[i];
-            str = right(str, str.length-5).split(".")[0].split(" - ");
-            str != "op"? pdf.push(str) : "";
-        }
+        if(files != undefined) {
+            for(let i = 0; i < files.length; i++) {
+                let str = files[i];
+                str = right(str, str.length-5).split(".")[0].split(" - ");
+                str != "op"? pdf.push(str) : "";
+            }
+        } else {isError = 1;}
     });
     
     let lessonInfo = [];
@@ -80,9 +85,26 @@ router.get("/all-courses/:id", (req, res) => {
         lessonInfo = check2Ds(names, pdf, 1, 0);
         // lessonInfo ==> [الخ ... "اسم الدرس", ["تفريغ", "كتاب"]]
         // console.log([names[15], pdf[52][1]], names[15] == pdf[52][1]); // عند ظهور مشاكل في اختلاف التسمية - اسم الملف
-        res.render("index", {lesInfo: JSON.stringify(lessonInfo), course: دورة, courses: courses, playlistID: playlistID});
+        isError != 1? res.render("index", {lesInfo: JSON.stringify(lessonInfo), course: دورة, courses: courses, playlistID: playlistID}) : res.status(404).send(`
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>خطأ</title>
+            <link data-default-icon="/public/صور/شعار.png" data-badged-icon="/public/صور/شعار.png" rel="shortcut icon" type="image/x-icon" href="/public/صور/شعار.png">
+        </head>
+        <body>
+            <h1>هذه الدورة غير موجودة</h1>
+        </body>
+        <script>
+            setTimeout(() => {
+                window.location.href = "/";
+            }, 5000);
+        </script>
+        </html>
+        `);;
     }, 500);
 });
-
 
 module.exports = router;
