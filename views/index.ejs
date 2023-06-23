@@ -256,8 +256,8 @@
     let courses = `<%= courses %>`.split(",");
     let playlistID = `<%= playlistID %>`.split(",");
     let apiKey = "AIzaSyAW0sQyMBkCSeoPuHxB0eOozsaos3FywMw";
-    console.log(JSON.parse(`<%= n %>`));
-    console.log(JSON.parse(`<%= p %>`));
+    console.log(`<%= n %>`);
+    console.log(`<%= p %>`);
     let availableOptions = document.querySelector(".available");
     let availableOptionsChilds = availableOptions.querySelectorAll("a");
     let lessonsList = document.querySelector(".lessons-list");
