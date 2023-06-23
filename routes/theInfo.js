@@ -83,6 +83,8 @@ router.get("/all-courses/:id", (req, res) => {
     let lessonInfo = [];
     setTimeout(() => {
         lessonInfo = check2Ds(names, pdf, 1, 0);
+        console.log(names);
+        console.log(pdf);
         // lessonInfo ==> [الخ ... "اسم الدرس", ["تفريغ", "كتاب"]]
         // console.log([names[15], pdf[52][1]], names[15] == pdf[52][1]); // عند ظهور مشاكل في اختلاف التسمية - اسم الملف
         isError != 1? res.render("index", {lesInfo: JSON.stringify(lessonInfo), course: دورة, courses: courses, playlistID: playlistID}) : res.status(404).send(`
