@@ -308,6 +308,8 @@
     let writeAvailableOptions = setInterval(() => {
         localStorage.getItem("active-lesson") == null || parseInt(localStorage.getItem("active-lesson") >= videos.length)? localStorage.setItem("active-lesson", 0) : "";
 
+        console.log(101010, courseInfo, localStorage.getItem("active-lesson") >= 0);
+
         if(courseInfo.length > 0 && localStorage.getItem("active-lesson") >= 0) {
             avOp = courseInfo[localStorage.getItem("active-lesson")][1]; // availableOptions
             let writeAvailableOptions2 = setInterval(() => {
