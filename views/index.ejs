@@ -256,7 +256,6 @@
     let courses = `<%= courses %>`.split(",");
     let playlistID = `<%= playlistID %>`.split(",");
     let apiKey = "AIzaSyAW0sQyMBkCSeoPuHxB0eOozsaos3FywMw";
-    console.log(`<%= fff %>`);
 
     let availableOptions = document.querySelector(".available");
     let availableOptionsChilds = availableOptions.querySelectorAll("a");
@@ -314,7 +313,9 @@
             let writeAvailableOptions2 = setInterval(() => {
                 if(avOp.length > 0 && availableOptionsChilds.length > 0 && lessonsListChilds.length > 0) {
                     let options = ["تفريغ", "تشجير", "تفريغ وتشجير", "كتاب"];
+                    console.log(111111);
                     for(let i = 0; i < avOp.length; i++) {
+                        console.log(avOp ,22222);
                         options.indexOf(avOp[i]) > -1? availableOptionsChilds[options.indexOf(avOp[i])].style.display = "" : "";
                         availableOptionsChilds[options.indexOf(avOp[i])].href = "/public/" + course + "/" + "تفريغ وتشجير" + "/" + makeZeroNum(parseInt(localStorage.getItem("active-lesson"))+1, 3) + "- " + availableOptionsChilds[options.indexOf(avOp[i])].innerText.split(" فقط").join("").split("قراءة من ال").join("") + " - " + lessonsListChilds[localStorage.getItem("active-lesson")].innerText + ".pdf";
                     }
