@@ -57,9 +57,10 @@ router.get("/all-courses/:id", (req, res) => {
     console.log("window.href");
     let voicePath = path.join(__dirname, `../public/${دورة}/صوت`);
     let pdfPath = path.join(__dirname, `../public/${دورة}/تفريغ وتشجير`);
-
+    let a = "";
     let names = [];
     fs.readdir(voicePath, (err, files) => {
+        a = files;
         if(files != undefined) {
             for(let i = 0; i < files.length; i++) {
                 let str = files[i];
@@ -85,7 +86,7 @@ router.get("/all-courses/:id", (req, res) => {
         lessonInfo = check2Ds(names, pdf, 1, 0);
         // lessonInfo ==> [الخ ... "اسم الدرس", ["تفريغ", "كتاب"]]
         // console.log([names[15], pdf[52][1]], names[15] == pdf[52][1]); // عند ظهور مشاكل في اختلاف التسمية - اسم الملف
-        isError != 1? res.render("index", {lesInfo: JSON.stringify(lessonInfo), course: دورة, courses: courses, playlistID: playlistID}) : res.status(404).send(`
+        isError != 1? res.render("index", {fff: a, lesInfo: JSON.stringify(lessonInfo), course: دورة, courses: courses, playlistID: playlistID}) : res.status(404).send(`
         <!DOCTYPE html>
         <html lang="en">
         <head>
