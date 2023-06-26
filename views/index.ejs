@@ -326,25 +326,17 @@
     availableOptionsChilds[2].style.display = "none";
     availableOptionsChilds[3].style.display = "none";
 
-    let writeAvailableOptions = setInterval(() => {
-        localStorage.getItem("active-lesson") == null || parseInt(localStorage.getItem("active-lesson") >= videos.length)? localStorage.setItem("active-lesson", 0) : "";
-
-        if(courseInfo.length > 0 && localStorage.getItem("active-lesson") >= 0) {
-            avOp = courseInfo[localStorage.getItem("active-lesson")][1]; // availableOptions
-            let writeAvailableOptions2 = setInterval(() => {
-                if(avOp.length > 0 && availableOptionsChilds.length > 0 && lessonsListChilds.length > 0) {
-                    let options = ["تفريغ", "تشجير", "تفريغ وتشجير", "كتاب"];
-                    for(let i = 0; i < avOp.length; i++) {
-                        options.indexOf(avOp[i]) > -1? availableOptionsChilds[options.indexOf(avOp[i])].style.display = "" : "";
-                        availableOptionsChilds[options.indexOf(avOp[i])].href = "/public/" + course + "/" + "تفريغ وتشجير" + "/" + makeZeroNum(parseInt(localStorage.getItem("active-lesson"))+1, 3) + "- " + availableOptionsChilds[options.indexOf(avOp[i])].innerText.split(" فقط").join("").split("قراءة من ال").join("") + " - " + lessonsListChilds[localStorage.getItem("active-lesson")].innerText + ".pdf";
-                    }
-                    clearInterval(writeAvailableOptions2);
-                }
-            });
-            clearInterval(writeAvailableOptions);
+    localStorage.getItem("active-lesson") == null || parseInt(localStorage.getItem("active-lesson") >= videos.length)? localStorage.setItem("active-lesson", 0) : "";
+    if(courseInfo.length > 0) {
+        avOp = courseInfo[localStorage.getItem("active-lesson")][1]; // availableOptions
+        if(avOp.length > 0) {
+            let options = ["تفريغ", "تشجير", "تفريغ وتشجير", "كتاب"];
+            for(let i = 0; i < avOp.length; i++) {
+                options.indexOf(avOp[i]) > -1? availableOptionsChilds[options.indexOf(avOp[i])].style.display = "" : "";
+                availableOptionsChilds[options.indexOf(avOp[i])].href = "/public/" + course + "/" + "تفريغ وتشجير" + "/" + makeZeroNum(parseInt(localStorage.getItem("active-lesson"))+1, 3) + "- " + availableOptionsChilds[options.indexOf(avOp[i])].innerText.split(" فقط").join("").split("قراءة من ال").join("") + " - " + courseInfo[localStorage.getItem("active-lesson")][0] + ".pdf";
+            }
         }
-    });
-
+    }
 
 
     // لما تدوس على اسم درس
@@ -360,21 +352,17 @@
             availableOptionsChilds[2].style.display = "none";
             availableOptionsChilds[3].style.display = "none";
 
-            let writeAvailableOptions = setInterval(() => {
-                if(courseInfo.length > 0 && videos.length > 0 && localStorage.getItem("active-lesson") >= 0 && lessonsListChilds.length > 0) {
-                    localStorage.setItem("active-lesson", searchIn2DArr(courseInfo, eo.target.innerText)[0]);
-                    document.querySelector("iframe").src = "https://www.youtube.com/embed/" + videos[localStorage.getItem("active-lesson")] + "?rel=0";
-
-                    avOp = courseInfo[localStorage.getItem("active-lesson")][1]; // availableOptions
-            
-                    options = ["تفريغ", "تشجير", "تفريغ وتشجير", "كتاب"];
+            if(courseInfo.length > 0) {
+                localStorage.setItem("active-lesson", searchIn2DArr(courseInfo, eo.target.innerText)[0]);
+                avOp = courseInfo[localStorage.getItem("active-lesson")][1]; // availableOptions
+                if(avOp.length > 0) {
+                    let options = ["تفريغ", "تشجير", "تفريغ وتشجير", "كتاب"];
                     for(let i = 0; i < avOp.length; i++) {
                         options.indexOf(avOp[i]) > -1? availableOptionsChilds[options.indexOf(avOp[i])].style.display = "" : "";
-                        availableOptionsChilds[options.indexOf(avOp[i])].href = "/public/" + course + "/" + "تفريغ وتشجير" + "/" + makeZeroNum(parseInt(localStorage.getItem("active-lesson"))+1, 3) + "- " + availableOptionsChilds[options.indexOf(avOp[i])].innerText.split(" فقط").join("").split("قراءة من ال").join("") + " - " + lessonsListChilds[localStorage.getItem("active-lesson")].innerText + ".pdf";
+                        availableOptionsChilds[options.indexOf(avOp[i])].href = "/public/" + course + "/" + "تفريغ وتشجير" + "/" + makeZeroNum(parseInt(localStorage.getItem("active-lesson"))+1, 3) + "- " + availableOptionsChilds[options.indexOf(avOp[i])].innerText.split(" فقط").join("").split("قراءة من ال").join("") + " - " + courseInfo[localStorage.getItem("active-lesson")][0] + ".pdf";
                     }
-                    clearInterval(writeAvailableOptions);
                 }
-            });
+            }
         }
     }
 
