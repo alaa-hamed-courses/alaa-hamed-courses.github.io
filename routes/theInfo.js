@@ -6,6 +6,9 @@ let path = require('path');
 let coursesPath = path.join(__dirname, `../public`);
 let coursesFilesPath;
 let playlistID = [];
+let startVideoInArr = [];
+let startVideoIn = 0; // مكان اول مقطع في قائمة التشغيل
+// let videosLength = 0; // عدد المقاطع في قائمة التشغيل
 let isError = 0;
 
 let courses = [];
@@ -16,7 +19,10 @@ fs.readdir(coursesPath, (err, folders) => {
             courses.push(str.trim());
             
             coursesFilesPath = path.join(__dirname, `../public/${folders[i]}/الرابط.txt`);
-            fs.readFile(coursesFilesPath, "utf8", (err, data) => {playlistID.push([folders[i], data]);})
+            fs.readFile(coursesFilesPath, "utf8", (err, data) => {
+                startVideoInArr.push(data.split("\r\n").length > 1? parseInt(data.split("\r\n")[1]) : 0);
+                playlistID.push([folders[i], data.split("\r\n")[0]]);
+            });
         }
     }
 });
@@ -53,9 +59,10 @@ router.get("/all-courses/:id", (req, res) => {
     
     let voicePath = path.join(__dirname, `../public/${دورة}/صوت`);
     let pdfPath = path.join(__dirname, `../public/${دورة}/تفريغ وتشجير`);
-    
+    let a = "";
     let names = [];
     fs.readdir(voicePath, (err, files) => {
+        a = files;
         if(files != undefined) {
             for(let i = 0; i < files.length; i++) {
                 let str = files[i];
@@ -79,10 +86,9 @@ router.get("/all-courses/:id", (req, res) => {
     let lessonInfo = [];
     setTimeout(() => {
         lessonInfo = check2Ds(names, pdf, 1, 0);
-        
         // lessonInfo ==> [الخ ... "اسم الدرس", ["تفريغ", "كتاب"]]
         // console.log([names[15], pdf[52][1]], names[15] == pdf[52][1]); // عند ظهور مشاكل في اختلاف التسمية - اسم الملف
-        isError != 1? res.render("index", {lesInfo: JSON.stringify(lessonInfo), course: دورة, courses: courses, playlistID: playlistID}) : res.status(404).send(`
+        isError != 1? res.render("index", {fff: a, lesInfo: JSON.stringify(lessonInfo), course: دورة, courses: courses, playlistID: playlistID, startVideoIn: startVideoInArr}) : res.status(404).send(`
         <!DOCTYPE html>
         <html lang="en">
         <head>
