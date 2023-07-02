@@ -191,7 +191,7 @@
     }
 </style>
 <script>
-    function searchIn2DArr(arr, item, column = 0) {// return index
+    function searchIn2DArr(arr, item, column = 0) {// return arrOfIndex
         let indexResults = [];
         for(let i = 0; i < arr.length; i++) {
             if(arr[i][column] == item) {
@@ -275,10 +275,11 @@
 
     let courseInfo = JSON.parse(`<%= lesInfo %>`.split("&#34;").join(`"`));
     let course = `<%= course %>`;
+    let startVideoIn = `<%= startVideoIn %>`.split(",");
     let courses = `<%= courses %>`.split(",");
     let playlistID = `<%= playlistID %>`.split(",");
     let apiKey = "AIzaSyAW0sQyMBkCSeoPuHxB0eOozsaos3FywMw";
-
+    
     let availableOptions = document.querySelector(".available");
     let availableOptionsChilds = availableOptions.querySelectorAll("a");
     let lessonsList = document.querySelector(".lessons-list");
@@ -287,6 +288,7 @@
     let lessonPlayer = audio.querySelector("source");
     
     playlistID = mergeArr(playlistID);
+    startVideoIn = parseInt(startVideoIn[searchIn2DArr(playlistID, course)[0]]);
 
     // تشغيل صوت الدرس
     localStorage.setItem("active-lesson", 0);
@@ -316,7 +318,7 @@
     // أول اما تشغل الصفحة يشغل الدرس اللي كان شغال آخر مرة
     let lastLesson = setInterval(() => {
         if(videos.length > 0 && lessonsListChilds.length > 0) {
-            document.querySelector("iframe").src = "https://www.youtube.com/embed/" + videos[localStorage.getItem("active-lesson")] + "?rel=0";
+            document.querySelector("iframe").src = "https://www.youtube.com/embed/" + videos[parseInt(localStorage.getItem("active-lesson"))+startVideoIn] + "?rel=0";
             clearInterval(lastLesson);
         }
     });
@@ -365,7 +367,7 @@
                     for(let i = 0; i < avOp.length; i++) {
                         options.indexOf(avOp[i]) > -1? availableOptionsChilds[options.indexOf(avOp[i])].style.display = "" : "";
                         availableOptionsChilds[options.indexOf(avOp[i])].href = "/public/" + course + "/" + "تفريغ وتشجير" + "/" + makeZeroNum(parseInt(localStorage.getItem("active-lesson"))+1, 3) + "- " + availableOptionsChilds[options.indexOf(avOp[i])].innerText.split(" فقط").join("").split("قراءة من ال").join("") + " - " + courseInfo[localStorage.getItem("active-lesson")][0] + ".pdf";
-                        document.querySelector("iframe").src = "https://www.youtube.com/embed/" + videos[localStorage.getItem("active-lesson")] + "?rel=0";
+                        document.querySelector("iframe").src = "https://www.youtube.com/embed/" + videos[parseInt(localStorage.getItem("active-lesson"))+startVideoIn] + "?rel=0";
                     }
                 }
             }
