@@ -7,8 +7,6 @@ let coursesPath = path.join(__dirname, `../public`);
 let coursesFilesPath;
 let playlistID = [];
 let startVideoInArr = [];
-let startVideoIn = 0; // مكان اول مقطع في قائمة التشغيل
-// let videosLength = 0; // عدد المقاطع في قائمة التشغيل
 let isError = 0;
 
 let courses = [];
