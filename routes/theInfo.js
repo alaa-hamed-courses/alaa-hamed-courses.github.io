@@ -6,7 +6,9 @@ let path = require('path');
 let coursesPath = path.join(__dirname, `../public`);
 let coursesFilesPath;
 let playlistID = [];
+let namesFiles = [];
 let startVideoInArr = [];
+let isTests = [];
 let isError = 0;
 
 let courses = [];
@@ -19,6 +21,7 @@ fs.readdir(coursesPath, (err, folders) => {
             coursesFilesPath = path.join(__dirname, `../public/${folders[i]}/الرابط.txt`);
             fs.readFile(coursesFilesPath, "utf8", (err, data) => {
                 startVideoInArr.push(data.split("\r\n").length > 1? parseInt(data.split("\r\n")[1]) : 0);
+                data.split("\r\n").length > 2 && data.split("\r\n")[2] != ""? namesFiles.push(0) : namesFiles.push(1);
                 playlistID.push([folders[i], data.split("\r\n")[0]]);
             });
         }
@@ -44,6 +47,18 @@ function check2Ds(arr1D, arr2D, i, ires) { // 1D=[1,2,3], 2D=[ [10,1], [20,1], [
     return final;
 }
 
+function search2D(arr, item, column_search = 0, column_result = 1) {
+    let res = [];
+    let i = 0;
+    while(i < arr.length) {
+        if(arr[i][column_search] == item)
+            res.push(arr[i][column_result]);
+        i++;
+    }
+
+    return res;
+}
+
 router.get("/", (req, res) => {
     res.redirect("/all-courses");
 });
@@ -57,7 +72,9 @@ router.get("/all-courses/:id", (req, res) => {
     
     let voicePath = path.join(__dirname, `../public/${دورة}/صوت`);
     let pdfPath = path.join(__dirname, `../public/${دورة}/تفريغ وتشجير`);
+    let filesPath = path.join(__dirname, `../public/${دورة}`);
     let a = "";
+
     let names = [];
     fs.readdir(voicePath, (err, files) => {
         a = files;
@@ -81,12 +98,46 @@ router.get("/all-courses/:id", (req, res) => {
         } else {isError = 1;}
     });
     
+    if(namesFiles[courses.indexOf(دورة)] == 0) {
+        names = [];
+        pdf = [];
+    }
+    
+    // isTest
+    fs.readdir(filesPath, (err, files) => {
+        if(files != undefined) {
+            for(let i = 0; i < files.length; i++) {
+                let str = files[i];
+                if(str.split(".txt")[0] == "اختبارات") {
+                    isTests.push(1);
+                } else {
+                    isTests.push(0);
+                }
+            }
+        } else {isError = 1;}
+    });
+
+    
+    let tests = [];
+    setTimeout(() => {
+        if(isTests[courses.indexOf(دورة)] == 1) {
+            testsPath = path.join(__dirname, `../public/${دورة}/اختبارات.txt`);
+            fs.readFile(testsPath, "utf8", (err, data) => {
+                console.log(data);
+                for(let i = 0; i < data.split("\r\n").length; i++) {
+                    let test = data.split("\r\n")[i];
+                    tests.push([test.split("- ")[0], test.split("- ")[1]]);
+                }
+            });
+        }
+    }, 700);
+    
     let lessonInfo = [];
     setTimeout(() => {
         lessonInfo = check2Ds(names, pdf, 1, 0);
         // lessonInfo ==> [الخ ... "اسم الدرس", ["تفريغ", "كتاب"]]
         // console.log([names[15], pdf[52][1]], names[15] == pdf[52][1]); // عند ظهور مشاكل في اختلاف التسمية - اسم الملف
-        isError != 1? res.render("index", {fff: a, lesInfo: JSON.stringify(lessonInfo), course: دورة, courses: courses, playlistID: playlistID, startVideoIn: startVideoInArr}) : res.status(404).send(`
+        isError != 1? res.render("index", {fff: a, lesInfo: JSON.stringify(lessonInfo), course: دورة, courses: courses, playlistID: playlistID, startVideoIn: startVideoInArr, tests: tests, namesFiles: namesFiles}) : res.status(404).send(`
         <!DOCTYPE html>
         <html lang="en">
         <head>
@@ -105,7 +156,7 @@ router.get("/all-courses/:id", (req, res) => {
         </script>
         </html>
         `);;
-    }, 500);
+    }, 700);
 });
 
 module.exports = router;
