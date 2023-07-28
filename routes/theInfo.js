@@ -84,6 +84,10 @@ router.get("/all-courses/:id", (req, res) => {
                 str = right(str, str.length-5).split(".")[0];
                 names.push(str.trim());
             }
+
+            if(namesFiles[courses.indexOf(دورة)] == 0) {
+                names = [];
+            }
         } else {isError = 1;}
     });
     
@@ -94,6 +98,10 @@ router.get("/all-courses/:id", (req, res) => {
                 let str = files[i];
                 str = right(str, str.length-5).split(".")[0].split(" - ");
                 str != "op"? pdf.push(str) : "";
+            }
+
+            if(namesFiles[courses.indexOf(دورة)] == 0) {
+                pdf = [];
             }
         } else {isError = 1;}
     });
