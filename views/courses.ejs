@@ -7,6 +7,18 @@
     <link data-default-icon="/public/صور/شعار.png" data-badged-icon="/public/صور/شعار.png" rel="shortcut icon" type="image/x-icon" href="/public/صور/شعار.png">
 </head>
 <body>
+    <%     function search2D(arr, item, column_search = 0, column_result = 1) {
+        let res = [];
+        let i = 0;
+        while(i < arr.length) {
+            if(arr[i][column_search] == item)
+                res.push(arr[i][column_result]);
+            i++;
+        }
+
+        return res;
+    }
+ %>
     <div class="main">
         <div class="pic">
             <img src="/public/صور/علاء حامد.png" alt="">
@@ -21,12 +33,25 @@
     </div>
 
     <div class="container">
+        <h1>الدورات</h1>
     <% for(let i = 0; i < courses.length; i++) { %>
-      <article>
-        <h2> <%= courses[i] %> </h2>
-        <a href="/all-courses/<%= courses[i] %>" class="get-href"></a>
-        <img src="/public/صور/<%= courses[i] %>.png" alt="<%= courses[i] %>">
-      </article>
+    <% if(search2D(namesFiles, courses[i]) == 1) { %>
+        <article>
+            <h2> <%= courses[i] %> </h2>
+            <a href="/all-courses/<%= courses[i] %>" class="get-href"></a>
+            <img src="/public/صور/<%= courses[i] %>.png" alt="<%= courses[i] %>">
+        </article>
+    <% } %>
+    <% } %>
+        <h1>البرامج واللايفات</h1>
+    <% for(let i = 0; i < courses.length; i++) { %>
+    <% if(search2D(namesFiles, courses[i]) == 0) { %>
+        <article>
+            <h2> <%= courses[i] %> </h2>
+            <a href="/all-courses/<%= courses[i] %>" class="get-href"></a>
+            <img src="/public/صور/<%= courses[i] %>.png" alt="<%= courses[i] %>">
+        </article>
+    <% } %>
     <% } %>
     </div>
 </body>
@@ -57,6 +82,7 @@
 
     body {
         padding-bottom: 150px;
+        font-family: Tajawal;
     }
     
     .main {
@@ -71,7 +97,6 @@
         background-color: #b96565;
         display: inline-block;
         animation: colors 2s infinite;
-        font-family: Tajawal;
         transition: all .5s;
     }
 
@@ -167,6 +192,15 @@
         margin-left: auto;
         justify-content: space-around;
         flex-wrap: wrap;
+    }
+
+    .container h1 {
+        background-color: #b96565;
+        width: 90%;
+        color: #fff;
+        text-align: center;
+        padding: 5px 0;
+        border-radius: 15px;
     }
 
     article {
