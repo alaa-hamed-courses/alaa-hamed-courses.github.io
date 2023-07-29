@@ -64,7 +64,7 @@ router.get("/", (req, res) => {
 });
 
 router.get("/all-courses", (req, res) => {
-    res.render("courses", {courses: courses, playlistID: playlistID});
+    res.render("courses", {courses: courses, playlistID: playlistID, namesFiles: namesFiles});
 });
 
 router.get("/all-courses/:id", (req, res) => {
