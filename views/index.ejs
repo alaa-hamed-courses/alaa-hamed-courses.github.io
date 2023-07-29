@@ -600,6 +600,8 @@
         if(courseInfo.length > 0 && in2D(tests, parseInt(localStorage.getItem("active-lesson")) + 1, 0)) {
             availableOptionsChilds[4].style.display = "";
             availableOptionsChilds[4].href = search2D(tests, parseInt(localStorage.getItem("active-lesson"))+1, 0, 1);
+        } else {
+            availableOptionsChilds[4].style.display = "none";
         }
     }, 500);
 
@@ -634,6 +636,8 @@
                 if(in2D(tests, parseInt(localStorage.getItem("active-lesson")) + 1, 0)) {
                     availableOptionsChilds[4].style.display = "";
                     availableOptionsChilds[4].href = search2D(tests, parseInt(localStorage.getItem("active-lesson"))+1, 0, 1);
+                } else {
+                    availableOptionsChilds[4].style.display = "none";
                 }
             }
         }
