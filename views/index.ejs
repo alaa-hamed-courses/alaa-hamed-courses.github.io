@@ -13,8 +13,10 @@
     </section>
 
     <section class="lesson-content">
-        <iframe  allowfullscreen="1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" src=""></iframe>
-        
+        <div class="iframe-container">
+            <iframe  allowfullscreen="1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" src=""></iframe>
+        </div>
+
         <div class="available">
             <a href="" target="_blank">تفريغ فقط</a>
             <a href="" target="_blank">تشجير فقط</a>
@@ -89,13 +91,27 @@
     }
 
     iframe {
-        position: relative;
-        right: -10%;
-        width: 80%;
-        height: 45rem;
         border-radius: .7rem;
         border: 2px solid #777;
         margin: 2rem 0;
+    }
+
+    .iframe-container {
+        position: relative;
+        left: 10%;
+        width: 80%;
+        padding-top: 56.25%; /* 16:9 Aspect Ratio (divide 9 by 16 = 0.5625) */
+        margin-bottom: 52px;
+    }
+
+    iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        width: 100%;
+        height: 100%;
     }
 
     .available, .voice-speed {
@@ -161,12 +177,6 @@
     
     .voice-speed a {
         padding: 6px 30px;
-    }
-
-    @media (max-width: 950px) {
-        iframe {
-            height: 12rem;
-        }
     }
 
     @media (max-width: 620px) {
