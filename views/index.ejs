@@ -484,7 +484,8 @@
                     .then(response => response.json())
                     .then(data => {
                         const title = data.items[0].snippet.title;
-                        titles.push([allVideos[x], removeSpaces(title.split("_")[0].split(".").join(""))]);
+                        course != "برنامج 3 دقائق الموسم 1"? titles.push([allVideos[x], removeSpaces(title.split("_")[0].split(".").join(""))]) : "";
+                        course == "برنامج 3 دقائق الموسم 1"? titles.push([allVideos[x], removeSpaces(title.split("_")[1].split(".").join(""))]) : "";
                     });
             }
             
