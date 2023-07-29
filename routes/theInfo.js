@@ -75,6 +75,11 @@ router.get("/all-courses/:id", (req, res) => {
     let filesPath = path.join(__dirname, `../public/${دورة}`);
     let a = "";
 
+    // tmp vars, cont ==> continue
+    let contIsTests = 0;
+    let contTests = 0;
+
+
     let names = [];
     fs.readdir(voicePath, (err, files) => {
         a = files;
@@ -113,48 +118,59 @@ router.get("/all-courses/:id", (req, res) => {
                 }
             }
         } else {isError = 1;}
+        contIsTests = 1;
     });
 
     
     let tests = [];
-    setTimeout(() => {
-        if(isTests.length > 0) {
-            testsPath = path.join(__dirname, `../public/${دورة}/اختبارات.txt`);
-            fs.readFile(testsPath, "utf8", (err, data) => {
-                for(let i = 0; i < data.split("\r\n").length; i++) {
-                    let test = data.split("\r\n")[i];
-                    tests.push([test.split("- ")[0], test.split("- ")[1]]);
-                }
-            });
+    let isTestsInterval = setInterval(() => {
+        if(contIsTests == 1) {
+            if(isTests.length > 0) {
+                testsPath = path.join(__dirname, `../public/${دورة}/اختبارات.txt`);
+                fs.readFile(testsPath, "utf8", (err, data) => {
+                    for(let i = 0; i < data.split("\r\n").length; i++) {
+                        let test = data.split("\r\n")[i];
+                        tests.push([test.split("- ")[0], test.split("- ")[1]]);
+                    }
+
+                    contTests = 1;
+                });
+            } else {contTests = 1;}
+
+            clearInterval(isTestsInterval);
         }
-    }, 690);
+    });
     
     let lessonInfo = [];
-    setTimeout(() => {
-        lessonInfo = check2Ds(names, pdf, 1, 0);
-        // lessonInfo ==> [الخ ... "اسم الدرس", ["تفريغ", "كتاب"]]
-        // console.log([names[15], pdf[52][1]], names[15] == pdf[52][1]); // عند ظهور مشاكل في اختلاف التسمية - اسم الملف
-        console.log(tests);
-        isError != 1? res.render("index", {fff: a, lesInfo: JSON.stringify(lessonInfo), course: دورة, courses: courses, playlistID: playlistID, startVideoIn: startVideoInArr, tests: tests, namesFiles: namesFiles}) : res.status(404).send(`
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>خطأ</title>
-            <link data-default-icon="/public/صور/شعار.png" data-badged-icon="/public/صور/شعار.png" rel="shortcut icon" type="image/x-icon" href="/public/صور/شعار.png">
-        </head>
-        <body>
-            <h1>هذه الدورة غير موجودة</h1>
-        </body>
-        <script>
-            setTimeout(() => {
-                window.location.href = "/";
-            }, 5000);
-        </script>
-        </html>
-        `);;
-    }, 790);
+    let testsInterval = setInterval(() => {
+        if(contTests == 1) {
+            lessonInfo = check2Ds(names, pdf, 1, 0);
+            // lessonInfo ==> [الخ ... "اسم الدرس", ["تفريغ", "كتاب"]]
+            // console.log([names[15], pdf[52][1]], names[15] == pdf[52][1]); // عند ظهور مشاكل في اختلاف التسمية - اسم الملف
+            console.log(tests);
+            isError != 1? res.render("index", {fff: a, lesInfo: JSON.stringify(lessonInfo), course: دورة, courses: courses, playlistID: playlistID, startVideoIn: startVideoInArr, tests: tests, namesFiles: namesFiles}) : res.status(404).send(`
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>خطأ</title>
+                <link data-default-icon="/public/صور/شعار.png" data-badged-icon="/public/صور/شعار.png" rel="shortcut icon" type="image/x-icon" href="/public/صور/شعار.png">
+            </head>
+            <body>
+                <h1>هذه الدورة غير موجودة</h1>
+            </body>
+            <script>
+                setTimeout(() => {
+                    window.location.href = "/";
+                }, 5000);
+            </script>
+            </html>
+            `);
+
+            clearInterval(testsInterval);
+        }
+    });
 });
 
 module.exports = router;
