@@ -490,43 +490,55 @@
     let idInPlaylist = setInterval(() => {
         allV.then(a => {allVideos = a});
         if(allVideos != undefined) {
-            // make titles ==> [video.link, video.title]
-            for(let x = 0; x < allVideos.length; x++) {
-                const videoId = allVideos[x];
-                const url = `https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${videoId}&fields=items(id,snippet)&key=${apiKey}`;
-                
-                fetch(url)
-                    .then(response => response.json())
-                    .then(data => {
-                        const title = data.items[0].snippet.title;
-                        course != "برنامج 3 دقائق الموسم 1"? titles.push([allVideos[x], removeSpaces(title.split("_")[0].split(".").join(""))]) : "";
-                        course == "برنامج 3 دقائق الموسم 1"? titles.push([allVideos[x], removeSpaces(title.split("_")[1].split(".").join(""))]) : "";
-                    });
-            }
-            
-            // make nVideos ==> titles.sort
-            let titlesAllV = setInterval(() => {
-                if(titles.length == allVideos.length) {
-                    nVideos = sort2DByArr(titles, allVideos);
-                    for(let x in nVideos) { courseInfo.push([removeSpaces(nVideos[x][1]), []]) }
-                    clearInterval(titlesAllV);
+            if(search2D(namesFiles, course) == 0) {
+                // make titles ==> [video.link, video.title]
+                for(let x = 0; x < allVideos.length; x++) {
+                    const videoId = allVideos[x];
+                    const url = `https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${videoId}&fields=items(id,snippet)&key=${apiKey}`;
+                    
+                    fetch(url)
+                        .then(response => response.json())
+                        .then(data => {
+                            const title = data.items[0].snippet.title;
+                            course != "برنامج 3 دقائق الموسم 1"? titles.push([allVideos[x], removeSpaces(title.split("_")[0].split(".").join(""))]) : "";
+                            course == "برنامج 3 دقائق الموسم 1"? titles.push([allVideos[x], removeSpaces(title.split("_")[1].split(".").join(""))]) : "";
+                        });
                 }
-            });
-            
+                
+                // make nVideos ==> titles.sort
+                let titlesAllV = setInterval(() => {
+                    if(titles.length == allVideos.length) {
+                        nVideos = sort2DByArr(titles, allVideos);
+                        for(let x in nVideos) { courseInfo.push([removeSpaces(nVideos[x][1]), []]) }
+                        clearInterval(titlesAllV);
+                    }
+                });
+                
+            }
+
             clearInterval(idInPlaylist);
         }
     });
 
     // الحصول على روابط الدروس في الدورة
     let videos;
-    // if(search2D(namesFiles, course)[0] == 0) {
-    let videosIdsInterval = setInterval(() => {
-        if(nVideos.length > 0 && nVideos.length == titles.length) {
-            videos = makeColumnArr(nVideos, 0);
-            clearInterval(videosIdsInterval);
-        }
-    });
-
+    if(search2D(namesFiles, course) == 0) {
+        let videosIdsInterval = setInterval(() => {
+            if(nVideos.length > 0 && nVideos.length == titles.length) {
+                videos = makeColumnArr(nVideos, 0);
+                clearInterval(videosIdsInterval);
+            }
+        });
+    } else {
+        let a = [];
+        a = getVideoIds(search2D(playlistID, course)[0], apiKey);
+        let tmp = setInterval(() => {
+            if(a != []) {
+                a.then((e) => {videos = e;});
+                clearInterval(tmp);
+            }
+        })
+    }
 
     // كتابة أسماء دروس الدورة في القائمة
     let writeLessonsList = setInterval(() => {
