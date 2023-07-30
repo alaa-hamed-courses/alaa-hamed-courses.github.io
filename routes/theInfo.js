@@ -89,7 +89,7 @@ router.get("/all-courses/:id", (req, res) => {
                 str = right(str, str.length-5).split(".")[0];
                 names.push(str.trim());
             }
-        } else {isError = 1;}
+        } else {isError.push(1);}
     });
     
     let pdf = [];
@@ -100,7 +100,7 @@ router.get("/all-courses/:id", (req, res) => {
                 str = right(str, str.length-5).split(".")[0].split(" - ");
                 str != "op"? pdf.push(str) : "";
             }
-        } else {isError = 1;}
+        } else {isError.push(2);}
     });
     
     if(namesFiles[courses.indexOf(دورة)] == 0) {
@@ -117,7 +117,7 @@ router.get("/all-courses/:id", (req, res) => {
                     isTests.push(1);
                 }
             }
-        } else {isError = 1;}
+        } else {isError.push(3);}
         contIsTests = 1;
     });
 
@@ -147,7 +147,7 @@ router.get("/all-courses/:id", (req, res) => {
             lessonInfo = check2Ds(names, pdf, 1, 0);
             // lessonInfo ==> [الخ ... "اسم الدرس", ["تفريغ", "كتاب"]]
             // console.log([names[15], pdf[52][1]], names[15] == pdf[52][1]); // عند ظهور مشاكل في اختلاف التسمية - اسم الملف
-            isError != 1? res.render("index", {fff: a, lesInfo: JSON.stringify(lessonInfo), course: دورة, courses: courses, playlistID: playlistID, startVideoIn: startVideoInArr, tests: tests, namesFiles: namesFiles}) : res.status(404).send(`
+            isError.length == 0? res.render("index", {fff: a, lesInfo: JSON.stringify(lessonInfo), course: دورة, courses: courses, playlistID: playlistID, startVideoIn: startVideoInArr, tests: tests, namesFiles: namesFiles}) : res.status(404).send(`
             <!DOCTYPE html>
             <html lang="en">
             <head>
@@ -157,7 +157,7 @@ router.get("/all-courses/:id", (req, res) => {
                 <link data-default-icon="/public/صور/شعار.png" data-badged-icon="/public/صور/شعار.png" rel="shortcut icon" type="image/x-icon" href="/public/صور/شعار.png">
             </head>
             <body>
-                <h1>هذه الدورة غير موجودة</h1>
+                <h1>هذه الدورة غير موجودة ${isError}</h1>
             </body>
             <script>
                 setTimeout(() => {
