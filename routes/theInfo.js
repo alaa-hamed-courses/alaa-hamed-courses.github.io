@@ -9,7 +9,7 @@ let playlistID = [];
 let namesFiles = [];
 let startVideoInArr = [];
 let isTests = [];
-let isError = 0;
+let isError = [];
 
 let courses = [];
 fs.readdir(coursesPath, (err, folders) => {
@@ -69,6 +69,7 @@ router.get("/all-courses", (req, res) => {
 
 router.get("/all-courses/:id", (req, res) => {
     دورة = req.params.id;
+    isError = [];
     
     let voicePath = path.join(__dirname, `../public/${دورة}/صوت`);
     let pdfPath = path.join(__dirname, `../public/${دورة}/تفريغ وتشجير`);
@@ -157,9 +158,10 @@ router.get("/all-courses/:id", (req, res) => {
                 <link data-default-icon="/public/صور/شعار.png" data-badged-icon="/public/صور/شعار.png" rel="shortcut icon" type="image/x-icon" href="/public/صور/شعار.png">
             </head>
             <body>
-                <h1>هذه الدورة غير موجودة ${isError}</h1>
+                <h1>هذه الدورة غير موجودة</h1>
             </body>
             <script>
+                console.log("isError = " + isError);
                 setTimeout(() => {
                     window.location.href = "/";
                 }, 5000);
