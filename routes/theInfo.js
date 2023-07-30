@@ -161,7 +161,7 @@ router.get("/all-courses/:id", (req, res) => {
                 <h1>هذه الدورة غير موجودة</h1>
             </body>
             <script>
-                console.log("isError = " + isError);
+                console.log("isError = [" + ${JSON.stringify(isError.sort((x, y) => x - ys))} + "]");
                 setTimeout(() => {
                     window.location.href = "/";
                 }, 5000);
