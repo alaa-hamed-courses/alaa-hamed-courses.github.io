@@ -20,9 +20,11 @@
         <div class="available">
             <a href="" target="_blank">تفريغ فقط</a>
             <a href="" target="_blank">تشجير فقط</a>
+            <a href="" target="_blank">تشجير مجمع</a>
             <a href="" target="_blank">تفريغ وتشجير</a>
             <a href="" target="_blank">قراءة من الكتاب</a>
             <a href="" target="_blank">اختبار</a>
+            <a href="" target="_blank">ملخص مجمع</a>
         </div>
 
         <audio id="lesson-player" controls="">
@@ -206,6 +208,45 @@
     }
 </style>
 <script>
+    function equalArr(arr, dimentions = 1) {
+        let res = [];
+
+        let i = 0;
+        while (i < arr.length) {
+            if (dimentions == 1) {
+                res.push(arr[i]);
+            } else {
+                res.push([]);
+                let e = 0;
+                while (e < arr[i].length) {
+                    if (dimentions == 2) {
+                        res[i].push(arr[i][e]);
+                    } else {
+                        res[i].push([]);
+                        let f = 0;
+                        while (f < arr[i][e].length) {
+                            res[i][e].push(arr[i][e][f]);
+                            f += 1;
+                        }
+                    }
+                    e += 1;
+                }
+            }
+            i += 1;
+        }
+
+        return res;
+    }
+
+    function allIndexInArr(arr, item) {
+        let ind = [];
+        for(let i = 0; i < arr.length; i++) {
+            arr[i] == item? ind.push(i) : "";
+        }
+
+        return ind;
+    }
+    
     function searchInd2D(arr, item, column = 0) {// return arrOfIndex
         let indexResults = [];
         for(let i = 0; i < arr.length; i++) {
@@ -259,13 +300,25 @@
         return arr.join("");
     }
 
-    function makeColumnArr(arr, column) {
+    function makeColumnArr(arr, column = 0) {
         let res = [];
         for(let i = 0; i < arr.length; i++) {
             res.push(arr[i][column]);
         }
 
         return res;
+    }
+
+    function rowToColumn(arr2D, row, columnNum = 0) {
+        arr2D = equalArr(arr2D);
+
+        let i = 0;
+        while(i < arr2D.length) {
+            arr2D[i][columnNum] = row[i];
+            i++;
+        }
+
+        return arr2D;
     }
 
     // function getVideoIds(playlistId, apiKey) {// max videos 50, without promis
@@ -446,9 +499,29 @@
         text = removeFromArr(text.split(" "), -1, "").join(" ");
         return text.trim();
     }
-   
+
+    function editItemCopies(arr) {// ["hello", "hello"] ==> ["hello", "hello 2"]
+        arr = equalArr(arr);
+
+        let i = 0;
+        let arrRD = RemoveDuplicates(arr);
+        while(i < arrRD.length) {
+            let itemCopitesIndex = allIndexInArr(arr, arrRD[i]);
+            itemCopitesIndex.forEach(function (value, i) {
+                if(i > 0) {
+                    arr[value] += " " + (i+1);
+                }
+            });
+            
+            i++;
+        }
+
+        return arr;
+    }
+    
     let courseInfo = JSON.parse(`<%= lesInfo %>`.split("&#34;").join(`"`));
     let course = `<%= course %>`;
+    let reload = `<%= reload %>`;
     let startVideoIn = `<%= startVideoIn %>`.split(",");
     let courses = `<%= courses %>`.split(",");
     let playlistID = `<%= playlistID %>`.split(",");
@@ -466,6 +539,8 @@
 
     playlistID = mergeArr(playlistID);
     startVideoIn = parseInt(startVideoIn[searchInd2D(playlistID, course)[0]]);
+    
+    reload == 0? localStorage.setItem("active-lesson", 0) : "";
     
     // لو دورة من غير ملفات
     let titles = [];
@@ -500,8 +575,8 @@
                         .then(response => response.json())
                         .then(data => {
                             const title = data.items[0].snippet.title;
-                            course != "برنامج 3 دقائق الموسم 1"? titles.push([allVideos[x], removeSpaces(title.split("_")[0].split(".").join(""))]) : "";
-                            course == "برنامج 3 دقائق الموسم 1"? titles.push([allVideos[x], removeSpaces(title.split("_")[1].split(".").join(""))]) : "";
+                            course != "برنامج 3 دقائق الموسم 1"? titles.push([allVideos[x], removeSpaces(title.split("_")[0].split(".").join("").split("|")[0])]) : "";
+                            course == "برنامج 3 دقائق الموسم 1"? titles.push([allVideos[x], removeSpaces(title.split("_")[1].split(".").join("").split("|")[0])]) : "";
                         });
                 }
                 
@@ -529,7 +604,8 @@
                 clearInterval(videosIdsInterval);
             }
         });
-    } else {
+    }
+    else {
         let a = [];
         a = getVideoIds(search2D(playlistID, course)[0], apiKey);
         let tmp = setInterval(() => {
@@ -539,6 +615,18 @@
             }
         })
     }
+
+    // لو في  درسين بنفس الإسم
+    let lessonsCopies = setInterval(() => {
+        if(courseInfo.length > 0) {
+            console.log(courseInfo);
+            let lessonsNames = makeColumnArr(courseInfo);
+            lessonsNames = editItemCopies(lessonsNames);
+            courseInfo = rowToColumn(courseInfo, lessonsNames, 0); 
+
+            clearInterval(lessonsCopies);
+        }
+    });
 
     // كتابة أسماء دروس الدورة في القائمة
     let writeLessonsList = setInterval(() => {
@@ -559,8 +647,6 @@
 
 
     // تشغيل صوت الدرس
-    localStorage.setItem("active-lesson", 0);
-
     let playAudio = setInterval(() => {
         if(courseInfo.length > 0) {
             search2D(namesFiles, course)[0] == 1? lessonPlayer.src = "/public/" + course + "/" + "صوت" + "/" + makeZeroNum(parseInt(localStorage.getItem("active-lesson"))+1, 3) + "- " + courseInfo[localStorage.getItem("active-lesson")][0] + ".mp3" : "";
@@ -583,11 +669,9 @@
 
     // الخيارات المتاحة للدرس - تشجير - تفريغ - قراءة من الكتاب
     let avOp;
-    availableOptionsChilds[0].style.display = "none";
-    availableOptionsChilds[1].style.display = "none";
-    availableOptionsChilds[2].style.display = "none";
-    availableOptionsChilds[3].style.display = "none";
-    availableOptionsChilds[4].style.display = "none";
+    availableOptionsChilds.forEach((item) => {
+        item.style.display = "none";
+    });
 
     let videosInterval = setInterval(() => {
         if(videos != undefined) {
@@ -599,7 +683,7 @@
     if(courseInfo.length > 0) {
         avOp = courseInfo[localStorage.getItem("active-lesson")][1]; // availableOptions
         if(avOp.length > 0) {
-            let options = ["تفريغ", "تشجير", "تفريغ وتشجير", "كتاب"];
+            let options = ["تفريغ", "تشجير", "تشجير مجمع", "تفريغ وتشجير", "كتاب", "ملخص مجمع"];
             for(let i = 0; i < avOp.length; i++) {
                 options.indexOf(avOp[i]) > -1? availableOptionsChilds[options.indexOf(avOp[i])].style.display = "" : "";
                 availableOptionsChilds[options.indexOf(avOp[i])].href = "/public/" + course + "/" + "تفريغ وتشجير" + "/" + makeZeroNum(parseInt(localStorage.getItem("active-lesson"))+1, 3) + "- " + availableOptionsChilds[options.indexOf(avOp[i])].innerText.split(" فقط").join("").split("قراءة من ال").join("") + " - " + courseInfo[localStorage.getItem("active-lesson")][0] + ".pdf";
@@ -610,10 +694,11 @@
     // الاختبار
     setTimeout(() => {
         if(courseInfo.length > 0 && in2D(tests, parseInt(localStorage.getItem("active-lesson")) + 1, 0)) {
-            availableOptionsChilds[4].style.display = "";
-            availableOptionsChilds[4].href = search2D(tests, parseInt(localStorage.getItem("active-lesson"))+1, 0, 1);
-        } else {
-            availableOptionsChilds[4].style.display = "none";
+            availableOptionsChilds[5].style.display = "";
+            availableOptionsChilds[5].href = search2D(tests, parseInt(localStorage.getItem("active-lesson"))+1, 0, 1);
+        }
+        else {
+            availableOptionsChilds[5].style.display = "none";
         }
     }, 500);
 
@@ -627,10 +712,12 @@
             availableOptionsChilds[1].style.display = "none";
             availableOptionsChilds[2].style.display = "none";
             availableOptionsChilds[3].style.display = "none";
+            availableOptionsChilds[4].style.display = "none";
+            availableOptionsChilds[5].style.display = "none";
             
             if(courseInfo.length > 0) {
                 localStorage.setItem("active-lesson", searchInd2D(courseInfo, eo.target.innerText)[0]);
-                document.querySelector("title").innerText = `دورة ${course} - ${lessonsListChilds[localStorage.getItem("active-lesson")].innerText}`;
+                document.querySelector("title").innerText = `${search2D(namesFiles, course) == 0? "" : "دورة "}${course} - ${lessonsListChilds[localStorage.getItem("active-lesson")].innerText}`;
                 document.querySelector("iframe").src = "https://www.youtube.com/embed/" + videos[parseInt(localStorage.getItem("active-lesson"))+startVideoIn] + "?rel=0";
 
                 search2D(namesFiles, course)[0] == 1? lessonPlayer.src = "/public/" + course + "/" + "صوت" + "/" + makeZeroNum(parseInt(localStorage.getItem("active-lesson"))+1, 3) + "- " + courseInfo[localStorage.getItem("active-lesson")][0] + ".mp3" : "";
@@ -638,7 +725,7 @@
 
                 avOp = courseInfo[localStorage.getItem("active-lesson")][1]; // availableOptions
                 if(avOp.length > 0) {
-                    let options = ["تفريغ", "تشجير", "تفريغ وتشجير", "كتاب"];
+                    let options = ["تفريغ", "تشجير", "تشجير مجمع", "تفريغ وتشجير", "كتاب", "ملخص مجمع"];
                     for(let i = 0; i < avOp.length; i++) {
                         options.indexOf(avOp[i]) > -1? availableOptionsChilds[options.indexOf(avOp[i])].style.display = "" : "";
                         availableOptionsChilds[options.indexOf(avOp[i])].href = "/public/" + course + "/" + "تفريغ وتشجير" + "/" + makeZeroNum(parseInt(localStorage.getItem("active-lesson"))+1, 3) + "- " + availableOptionsChilds[options.indexOf(avOp[i])].innerText.split(" فقط").join("").split("قراءة من ال").join("") + " - " + courseInfo[localStorage.getItem("active-lesson")][0] + ".pdf";
@@ -646,10 +733,10 @@
                 }
             
                 if(in2D(tests, parseInt(localStorage.getItem("active-lesson")) + 1, 0)) {
-                    availableOptionsChilds[4].style.display = "";
-                    availableOptionsChilds[4].href = search2D(tests, parseInt(localStorage.getItem("active-lesson"))+1, 0, 1);
+                    availableOptionsChilds[5].style.display = "";
+                    availableOptionsChilds[5].href = search2D(tests, parseInt(localStorage.getItem("active-lesson"))+1, 0, 1);
                 } else {
-                    availableOptionsChilds[4].style.display = "none";
+                    availableOptionsChilds[5].style.display = "none";
                 }
             }
         }
@@ -683,8 +770,8 @@
     let oneFive = theSpeed.querySelector(".one-five");
     let oneSeventyFive = theSpeed.querySelector(".one-seventy-five");
     let two = theSpeed.querySelector(".two");
-    
-    
+
+
     one.onclick = () => {audio.playbackRate=1;}
     oneTwentyFive.onclick = () => {audio.playbackRate=1.25;}
     oneFive.onclick = () => {audio.playbackRate=1.5;}
