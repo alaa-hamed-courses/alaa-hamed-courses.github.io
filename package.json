@@ -13,7 +13,7 @@
     "watch": "nodemon --ext js,ejs --ignore public"
   },
   "engines": {
-    "node": "16.11.0"
+    "node": "18.x"
   },
   "name": "alaa-hamed-courses",
   "version": "1.0.0",
