@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="og:image" content="" class="page-share-image">
     <title><%= namesFiles[courses.indexOf(course)] == 1? `دورة ${course}` : `${course}`; %></title>
 </head>
 <body>
@@ -519,6 +520,90 @@
         return arr;
     }
     
+    function searchInObjArr(arr, key_want_search, value_want_search) {
+        const res = [];
+        const ind = [];
+
+        for (let i = 0; i < arr.length; i++) {
+            const item = arr[i];
+
+            if (typeof item === 'object' && item !== null) {
+                if (key_want_search in item && item[key_want_search] === value_want_search) {
+                    res.push(item);
+                    ind.push(i);
+                }
+            }
+        }
+
+        return [res, ind];
+    }
+
+    // ربط العميل بالخادم
+    function getDataFromServer() {
+        return fetch(`${myProtocol}//${myLocation}/get-data`)
+            .then(response => response.json())
+            .then(data => {
+                // console.log('البيانات المخزنة في السيرفر:', data);
+                // استخدام البيانات كما تحتاج
+                return data;
+            })
+            .catch(error => {
+                console.error('حدث خطأ أثناء استرجاع البيانات:', error);
+                throw error; // يمكنك رمي الخطأ مرة أخرى ليتم التعامل معه في الكود الذي يستدعي هذه الوظيفة
+            });
+    }
+
+    function saveDataToServer(course_data, active_lesson_data) {
+        fetch(`${myProtocol}//${myLocation}/save-data`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ "course": course_data, "active_lesson": active_lesson_data }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('تم حفظ البيانات على السيرفر:', data);
+        })
+        .catch(error => {
+            console.error('حدث خطأ أثناء حفظ البيانات:', error);
+        });
+    }
+
+    function updateDataOnServer(course_data, active_lesson_data) {
+        return new Promise((resolve, reject) => {
+            fetch(`${myProtocol}//${myLocation}/update-data/${course_data}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ active_lesson: active_lesson_data }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(`تم تحديث البيانات بنجاح:`, data);
+                resolve(data); // يتم حل الوعد بالبيانات المسترجعة
+            })
+            .catch(error => {
+                console.error('حدث خطأ أثناء تحديث البيانات:', error);
+                reject(error); // يتم رفض الوعد بالخطأ
+            });
+        });
+    }
+
+    function deleteDataFromServer() {
+        fetch(`${myProtocol}//${myLocation}/delete-data`, {
+            method: 'DELETE',
+        })
+        .then(response => response.text())
+        .then(data => {
+            console.log('تم حذف البيانات على السيرفر:', data);
+        })
+        .catch(error => {
+            console.error('حدث خطأ أثناء حذف البيانات:', error);
+        });
+    }
+
     let courseInfo = JSON.parse(`<%= lesInfo %>`.split("&#34;").join(`"`));
     let course = `<%= course %>`;
     let reload = `<%= reload %>`;
@@ -536,12 +621,15 @@
     let audio = document.querySelector("#lesson-player");
     let lessonPlayer = audio.querySelector("source");
     let theSpeed = document.querySelector(".voice-speed");
+    
+    let myLocation = window.location.host;
+    let myProtocol = window.location.protocol;
+    let myData = "";
+    getDataFromServer().then((data) => {myData = data;});
 
     playlistID = mergeArr(playlistID);
     startVideoIn = parseInt(startVideoIn[searchInd2D(playlistID, course)[0]]);
-    
-    reload == 0? localStorage.setItem("active-lesson", 0) : "";
-    
+        
     // لو دورة من غير ملفات
     let titles = [];
     let allV = getVideoIds(playlistID[indexOf2D(playlistID, course)[0]][1], apiKey);
@@ -551,13 +639,11 @@
         courseInfo = [];
         availableOptions.style.display = "none";
         audio.style.display = "none";
-        audio.style.display = "none";
         theSpeed.style.display = "none";
         document.querySelector(".lesson-content").classList.add("padding");
     }
     else {
         availableOptions.style.display = "";
-        audio.style.display = "";
         audio.style.display = "";
         theSpeed.style.display = "";
     }
@@ -619,7 +705,6 @@
     // لو في  درسين بنفس الإسم
     let lessonsCopies = setInterval(() => {
         if(courseInfo.length > 0) {
-            console.log(courseInfo);
             let lessonsNames = makeColumnArr(courseInfo);
             lessonsNames = editItemCopies(lessonsNames);
             courseInfo = rowToColumn(courseInfo, lessonsNames, 0); 
@@ -630,17 +715,18 @@
 
     // كتابة أسماء دروس الدورة في القائمة
     let writeLessonsList = setInterval(() => {
-        if(courseInfo.length > 0) {
+        if(courseInfo.length > 0 && myData != "") {
+            let active_lesson = searchInObjArr(myData, "course", course)[0][0]["active_lesson"]-1;
             for(let i = 0; i < courseInfo.length; i++) {
                 const lessonClick = document.createElement("h1");
                 lessonClick.innerText = courseInfo[i][0];
                 lessonsList.querySelector("div").append(lessonClick);
-                i == parseInt(localStorage.getItem("active-lesson"))? lessonClick.classList.add("active") : "";
+                i == active_lesson? lessonClick.classList.add("active") : "";
             }
             
             lessonsListChilds = lessonsList.querySelectorAll("div h1");
-            search2D(namesFiles, course)[0] == 1? document.querySelector("title").innerText = `دورة ${course} - ${lessonsListChilds[localStorage.getItem("active-lesson")].innerText}` : "";
-            search2D(namesFiles, course)[0] == 0? document.querySelector("title").innerText = `${course} - ${lessonsListChilds[localStorage.getItem("active-lesson")].innerText}` : "";
+            search2D(namesFiles, course)[0] == 1? document.querySelector("title").innerText = `دورة ${course} - ${lessonsListChilds[active_lesson].innerText}` : "";
+            search2D(namesFiles, course)[0] == 0? document.querySelector("title").innerText = `${course} - ${lessonsListChilds[active_lesson].innerText}` : "";
             clearInterval(writeLessonsList);
         }
     });
@@ -648,8 +734,9 @@
 
     // تشغيل صوت الدرس
     let playAudio = setInterval(() => {
-        if(courseInfo.length > 0) {
-            search2D(namesFiles, course)[0] == 1? lessonPlayer.src = "/public/" + course + "/" + "صوت" + "/" + makeZeroNum(parseInt(localStorage.getItem("active-lesson"))+1, 3) + "- " + courseInfo[localStorage.getItem("active-lesson")][0] + ".mp3" : "";
+        if(courseInfo.length > 0 && myData != "") {
+            let active_lesson = searchInObjArr(myData, "course", course)[0][0]["active_lesson"]-1;
+            search2D(namesFiles, course)[0] == 1? lessonPlayer.src = "/public/" + course + "/" + "صوت" + "/" + makeZeroNum(active_lesson+1, 3) + "- " + courseInfo[active_lesson][0] + ".mp3" : "";
             search2D(namesFiles, course)[0] == 1? lessonPlayer.parentNode.load() : "";
             clearInterval(playAudio);
         }
@@ -659,8 +746,10 @@
     // أول اما تشغل الصفحة يشغل الدرس اللي كان شغال آخر مرة
     let lastLesson = setInterval(() => {
         if(videos != undefined) {
-            if(videos.length > 0 && lessonsListChilds.length > 0) {
-                document.querySelector("iframe").src = "https://www.youtube.com/embed/" + videos[parseInt(localStorage.getItem("active-lesson"))+startVideoIn] + "?rel=0";
+            if(videos.length > 0 && lessonsListChilds.length > 0 && myData != "") {
+                let active_lesson = searchInObjArr(myData, "course", course)[0][0]["active_lesson"]-1;
+                document.querySelector("iframe").src = "https://www.youtube.com/embed/" + videos[active_lesson+startVideoIn] + "?rel=0";
+                document.querySelector(".page-share-image").setAttribute("content", "https://i.ytimg.com/vi/" + videos[active_lesson+startVideoIn] + "/maxresdefault.jpg");
                 clearInterval(lastLesson);
             }
         }
@@ -672,42 +761,41 @@
     availableOptionsChilds.forEach((item) => {
         item.style.display = "none";
     });
+    
+    let dataInterval = setInterval(() => {
+        if(courseInfo.length > 0 && myData != "") {
 
-    let videosInterval = setInterval(() => {
-        if(videos != undefined) {
-            localStorage.getItem("active-lesson") == null || parseInt(localStorage.getItem("active-lesson") >= videos.length)? localStorage.setItem("active-lesson", 0) : "";
-            clearInterval(videosInterval);
+            let active_lesson = searchInObjArr(myData, "course", course)[0][0]["active_lesson"]-1;
+            avOp = courseInfo[active_lesson][1]; // availableOptions
+            if(avOp.length > 0) {
+                let options = ["تفريغ", "تشجير", "تشجير مجمع", "تفريغ وتشجير", "كتاب", "ملخص مجمع"];
+                for(let i = 0; i < avOp.length; i++) {
+                    options.indexOf(avOp[i]) > -1? availableOptionsChilds[options.indexOf(avOp[i])].style.display = "" : "";
+                    availableOptionsChilds[options.indexOf(avOp[i])].href = "/public/" + course + "/" + "تفريغ وتشجير" + "/" + makeZeroNum(active_lesson+1, 3) + "- " + availableOptionsChilds[options.indexOf(avOp[i])].innerText.split(" فقط").join("").split("قراءة من ال").join("") + " - " + courseInfo[active_lesson][0] + ".pdf";
+                }
+            }
+
+            clearInterval(dataInterval);
         }
     });
-
-    if(courseInfo.length > 0) {
-        avOp = courseInfo[localStorage.getItem("active-lesson")][1]; // availableOptions
-        if(avOp.length > 0) {
-            let options = ["تفريغ", "تشجير", "تشجير مجمع", "تفريغ وتشجير", "كتاب", "ملخص مجمع"];
-            for(let i = 0; i < avOp.length; i++) {
-                options.indexOf(avOp[i]) > -1? availableOptionsChilds[options.indexOf(avOp[i])].style.display = "" : "";
-                availableOptionsChilds[options.indexOf(avOp[i])].href = "/public/" + course + "/" + "تفريغ وتشجير" + "/" + makeZeroNum(parseInt(localStorage.getItem("active-lesson"))+1, 3) + "- " + availableOptionsChilds[options.indexOf(avOp[i])].innerText.split(" فقط").join("").split("قراءة من ال").join("") + " - " + courseInfo[localStorage.getItem("active-lesson")][0] + ".pdf";
-            }
-        }
-    }
-
+    
     // الاختبار
     setTimeout(() => {
-        if(courseInfo.length > 0 && in2D(tests, parseInt(localStorage.getItem("active-lesson")) + 1, 0)) {
-            availableOptionsChilds[5].style.display = "";
-            availableOptionsChilds[5].href = search2D(tests, parseInt(localStorage.getItem("active-lesson"))+1, 0, 1);
-        }
-        else {
-            availableOptionsChilds[5].style.display = "none";
+        if(courseInfo.length > 0 && myData != "") {
+            let active_lesson = searchInObjArr(myData, "course", course)[0][0]["active_lesson"]-1;
+            if(in2D(tests, active_lesson+1, 0)) {
+                availableOptionsChilds[5].style.display = "";
+                availableOptionsChilds[5].href = search2D(tests, active_lesson+1, 0, 1);
+            }
+            else {
+                availableOptionsChilds[5].style.display = "none";
+            }
         }
     }, 500);
-
 
     // لما تدوس على اسم درس
     lessonsList.querySelector("div").onclick = (eo) => {
         if(eo.target.tagName.toLowerCase() == "h1") {
-            localStorage.getItem("active-lesson") == null || parseInt(localStorage.getItem("active-lesson") >= videos.length)? localStorage.setItem("active-lesson", 0) : "";
-            
             availableOptionsChilds[0].style.display = "none";
             availableOptionsChilds[1].style.display = "none";
             availableOptionsChilds[2].style.display = "none";
@@ -715,29 +803,8 @@
             availableOptionsChilds[4].style.display = "none";
             availableOptionsChilds[5].style.display = "none";
             
-            if(courseInfo.length > 0) {
-                localStorage.setItem("active-lesson", searchInd2D(courseInfo, eo.target.innerText)[0]);
-                document.querySelector("title").innerText = `${search2D(namesFiles, course) == 0? "" : "دورة "}${course} - ${lessonsListChilds[localStorage.getItem("active-lesson")].innerText}`;
-                document.querySelector("iframe").src = "https://www.youtube.com/embed/" + videos[parseInt(localStorage.getItem("active-lesson"))+startVideoIn] + "?rel=0";
-
-                search2D(namesFiles, course)[0] == 1? lessonPlayer.src = "/public/" + course + "/" + "صوت" + "/" + makeZeroNum(parseInt(localStorage.getItem("active-lesson"))+1, 3) + "- " + courseInfo[localStorage.getItem("active-lesson")][0] + ".mp3" : "";
-                search2D(namesFiles, course)[0] == 1? lessonPlayer.parentNode.load() : "";
-
-                avOp = courseInfo[localStorage.getItem("active-lesson")][1]; // availableOptions
-                if(avOp.length > 0) {
-                    let options = ["تفريغ", "تشجير", "تشجير مجمع", "تفريغ وتشجير", "كتاب", "ملخص مجمع"];
-                    for(let i = 0; i < avOp.length; i++) {
-                        options.indexOf(avOp[i]) > -1? availableOptionsChilds[options.indexOf(avOp[i])].style.display = "" : "";
-                        availableOptionsChilds[options.indexOf(avOp[i])].href = "/public/" + course + "/" + "تفريغ وتشجير" + "/" + makeZeroNum(parseInt(localStorage.getItem("active-lesson"))+1, 3) + "- " + availableOptionsChilds[options.indexOf(avOp[i])].innerText.split(" فقط").join("").split("قراءة من ال").join("") + " - " + courseInfo[localStorage.getItem("active-lesson")][0] + ".pdf";
-                    }
-                }
-            
-                if(in2D(tests, parseInt(localStorage.getItem("active-lesson")) + 1, 0)) {
-                    availableOptionsChilds[5].style.display = "";
-                    availableOptionsChilds[5].href = search2D(tests, parseInt(localStorage.getItem("active-lesson"))+1, 0, 1);
-                } else {
-                    availableOptionsChilds[5].style.display = "none";
-                }
+            if(courseInfo.length > 0 && myData != "") {
+                window.location.pathname = `/all-courses/${course}/${searchInd2D(courseInfo, eo.target.innerText)[0]+1}`;
             }
         }
     }
@@ -745,7 +812,6 @@
 
     // وضع خط تحت اسم الدرس الحالي
     let btns = document.querySelectorAll(".lessons-list h1");
-    
     let makeActiveLesson = setInterval(() => {
         if(document.querySelectorAll(".lessons-list h1").length > 0) {
             btns = document.querySelectorAll(".lessons-list h1");
