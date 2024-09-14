@@ -116,6 +116,10 @@ a.home {
     transition: all .5s;
 }
 
+.available {
+    display: none;
+}
+
 a.home:hover {
     color: #fff;
     box-shadow: 10px 10px 10px #9e4673;
