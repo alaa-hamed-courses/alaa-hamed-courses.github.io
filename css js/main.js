@@ -5,7 +5,7 @@ function makeCourse(cont, course_name) {
 
     a.href = "course.html";
     a.classList.add("get-href");
-    img.src = `/public/صور/${course_name}.png`;
+    img.src = `./public/صور/${course_name}.png`;
     img.alt = course_name;
 
     a.onclick = () => {
