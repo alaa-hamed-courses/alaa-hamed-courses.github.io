@@ -30,7 +30,7 @@ async function getVideoIds(playlistId, apiKey) {// without max videos, with prom
 // الملفات
 function loadAudio() {
     if(course_name in courses_data) {
-        audio.querySelector("source").src = `/public/${course_name}/صوت/${makeZeroNum(active_lesson+1, 3)}- ${courses_data[course_name][active_lesson]["الإسم"]}.mp3`;
+        audio.querySelector("source").src = `./public/${course_name}/صوت/${makeZeroNum(active_lesson+1, 3)}- ${courses_data[course_name][active_lesson]["الإسم"]}.mp3`;
         audio.load();
     } else {
         audio.style.display = "none";
@@ -43,27 +43,27 @@ function loadOptions() {
         let lesson_info = courses_data[course_name][active_lesson];
         if(lesson_info["تفريغ"] == true) {
             availableOptionsChilds[0].style.display = "";
-            availableOptionsChilds[0].href = `/public/${course_name}/تفريغ وتشجير/${makeZeroNum(active_lesson+1, 3)}- تفريغ - ${courses_data[course_name][active_lesson]["الإسم"]}.pdf`;
+            availableOptionsChilds[0].href = `./public/${course_name}/تفريغ وتشجير/${makeZeroNum(active_lesson+1, 3)}- تفريغ - ${courses_data[course_name][active_lesson]["الإسم"]}.pdf`;
         }
         if(lesson_info["تشجير"] == true) {
             availableOptionsChilds[1].style.display = "";
-            availableOptionsChilds[1].href = `/public/${course_name}/تفريغ وتشجير/${makeZeroNum(active_lesson+1, 3)}- تشجير - ${courses_data[course_name][active_lesson]["الإسم"]}.pdf`;
+            availableOptionsChilds[1].href = `./public/${course_name}/تفريغ وتشجير/${makeZeroNum(active_lesson+1, 3)}- تشجير - ${courses_data[course_name][active_lesson]["الإسم"]}.pdf`;
         }
         if(lesson_info["تشجير مجمع"] == true) {
             availableOptionsChilds[2].style.display = "";
-            availableOptionsChilds[2].href = `/public/${course_name}/تفريغ وتشجير/${makeZeroNum(active_lesson+1, 3)}- تشجير مجمع - ${courses_data[course_name][active_lesson]["الإسم"]}.pdf`;
+            availableOptionsChilds[2].href = `./public/${course_name}/تفريغ وتشجير/${makeZeroNum(active_lesson+1, 3)}- تشجير مجمع - ${courses_data[course_name][active_lesson]["الإسم"]}.pdf`;
         }
         if(lesson_info["تفريغ وتشجير"] == true) {
             availableOptionsChilds[3].style.display = "";
-            availableOptionsChilds[3].href = `/public/${course_name}/تفريغ وتشجير/${makeZeroNum(active_lesson+1, 3)}- تفريغ وتشجير - ${courses_data[course_name][active_lesson]["الإسم"]}.pdf`;
+            availableOptionsChilds[3].href = `./public/${course_name}/تفريغ وتشجير/${makeZeroNum(active_lesson+1, 3)}- تفريغ وتشجير - ${courses_data[course_name][active_lesson]["الإسم"]}.pdf`;
         }
         if(lesson_info["قراءة من الكتاب"] == true) {
             availableOptionsChilds[4].style.display = "";
-            availableOptionsChilds[4].href = `/public/${course_name}/تفريغ وتشجير/${makeZeroNum(active_lesson+1, 3)}- كتاب - ${courses_data[course_name][active_lesson]["الإسم"]}.pdf`;
+            availableOptionsChilds[4].href = `./public/${course_name}/تفريغ وتشجير/${makeZeroNum(active_lesson+1, 3)}- كتاب - ${courses_data[course_name][active_lesson]["الإسم"]}.pdf`;
         }
         if(lesson_info["ملخص مجمع"] == true) {
             availableOptionsChilds[6].style.display = "";
-            availableOptionsChilds[6].href = `/public/${course_name}/تفريغ وتشجير/${makeZeroNum(active_lesson+1, 3)}- ملخص مجمع - ${courses_data[course_name][active_lesson]["الإسم"]}.pdf`;
+            availableOptionsChilds[6].href = `./public/${course_name}/تفريغ وتشجير/${makeZeroNum(active_lesson+1, 3)}- ملخص مجمع - ${courses_data[course_name][active_lesson]["الإسم"]}.pdf`;
         }
         if(lesson_info["اختبار"] != null) {
             availableOptionsChilds[5].style.display = "";
