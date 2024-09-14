@@ -116,7 +116,7 @@ a.home {
     transition: all .5s;
 }
 
-.available {
+.available a {
     display: none;
 }
 
