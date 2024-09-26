@@ -722,7 +722,7 @@ let courses_data = {
             "اختبار": "https://docs.google.com/forms/d/e/1FAIpQLSeJCsHY_pq2wGSbU19BM0Ci6qqm14i9m6kTUcHLHmFfa5FsAA/viewform"
         },
         {
-            "الإسم": "الشهوة الحرام والزنا واللواط",
+            "الإسم": "الشهوة الحرام الزنا واللواط",
             "تفريغ": true,
             "تشجير": true,
             "تشجير مجمع": false,
