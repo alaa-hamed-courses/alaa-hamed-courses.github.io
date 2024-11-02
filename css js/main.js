@@ -1,21 +1,17 @@
-function makeCourse(cont, course_name) {
+function makeCourse(container, course_name) {
     let article = document.createElement("article");
     let a = document.createElement("a");
     let img = document.createElement("img");
 
-    a.href = "course.html";
+    a.href = `course.html?course=${course_name}`;
     a.classList.add("get-href");
-    img.src = `./public/صور/${course_name}.png`;
+    img.src = `/public/صور/${course_name}.png`;
     img.alt = course_name;
-
-    a.onclick = () => {
-        localStorage.setItem("active course", course_name);
-    }
 
     article.appendChild(a);
     article.appendChild(img);
 
-    cont.appendChild(article);
+    container.appendChild(article);
 }
 
 function equalArr(arr, dimentions = 1) {
@@ -57,7 +53,7 @@ function addArr(arr1, arr2) {
     return arr;
 }
 
-function makeObj(arr, value) {
+function makeObj(arr, value) { // {arr[0]: value, arr[1]: value, arr[2]: value, ...}
     let res = {};
     for(let i = 0; i < arr.length; i++) {
         res[arr[i]] = value;
@@ -92,9 +88,8 @@ let lives = [
     "مدرس دين",
 ].sort();
 
-// بينات المشاهدة
-if(localStorage.getItem("active lessons info") == null) {
-    // {"course": 0}
+// بيانات المشاهدة
+if(localStorage.getItem("active lessons info") == null) { // {"course 1": 0, ...}
     localStorage.setItem("active lessons info", JSON.stringify(makeObj(addArr(courses, lives), 0)));
 }
 
