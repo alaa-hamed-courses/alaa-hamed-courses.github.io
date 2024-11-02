@@ -1,5 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@700&display=swap');
-    
+@font-face {
+    font-family: 'Tajawal';
+    src: url('../fonts/Tajawal/Tajawal-Bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+}
+
 @keyframes colors {
     0%   {box-shadow: 0 7px 17px 0 rgb(255 131 131 / 47%);}
     50%  {box-shadow: 0 7px 17px 0 rgba(41, 152, 255, 0.47);}
