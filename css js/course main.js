@@ -30,7 +30,10 @@ async function getVideoIds(playlistId, apiKey) {// without max videos, with prom
 // الملفات
 function loadAudio() {
     if(course_name in courses_data) {
-        audio.querySelector("source").src = `./public/${course_name}/صوت/${makeZeroNum(active_lesson+1, 3)}- ${courses_data[course_name][active_lesson]["الإسم"]}.mp3`;
+        let file_name = courses_data[course_name][active_lesson]["الإسم"];
+        let lesson_num = makeZeroNum(active_lesson+1, 3);
+
+        audio.querySelector("source").src = `/public/${course_name}/صوت/${lesson_num}- ${file_name}.mp3`;
         audio.load();
     } else {
         audio.style.display = "none";
@@ -41,29 +44,36 @@ function loadAudio() {
 function loadOptions() {
     if(course_name in courses_data) {
         let lesson_info = courses_data[course_name][active_lesson];
+        let file_name = courses_data[course_name][active_lesson]["الإسم"];
+        let lesson_num = makeZeroNum(active_lesson+1, 3);
+
+        function file_path(method) {
+            return `/public/${course_name}/تفريغ وتشجير/${lesson_num}- ${method} - ${file_name}.pdf`;
+        }
+
         if(lesson_info["تفريغ"] == true) {
             availableOptionsChilds[0].style.display = "";
-            availableOptionsChilds[0].href = `./public/${course_name}/تفريغ وتشجير/${makeZeroNum(active_lesson+1, 3)}- تفريغ - ${courses_data[course_name][active_lesson]["الإسم"]}.pdf`;
+            availableOptionsChilds[0].href = file_path("تفريغ");
         }
         if(lesson_info["تشجير"] == true) {
             availableOptionsChilds[1].style.display = "";
-            availableOptionsChilds[1].href = `./public/${course_name}/تفريغ وتشجير/${makeZeroNum(active_lesson+1, 3)}- تشجير - ${courses_data[course_name][active_lesson]["الإسم"]}.pdf`;
+            availableOptionsChilds[1].href = file_path("تشجير");
         }
         if(lesson_info["تشجير مجمع"] == true) {
             availableOptionsChilds[2].style.display = "";
-            availableOptionsChilds[2].href = `./public/${course_name}/تفريغ وتشجير/${makeZeroNum(active_lesson+1, 3)}- تشجير مجمع - ${courses_data[course_name][active_lesson]["الإسم"]}.pdf`;
+            availableOptionsChilds[2].href = file_path("تشجير مجمع");
         }
         if(lesson_info["تفريغ وتشجير"] == true) {
             availableOptionsChilds[3].style.display = "";
-            availableOptionsChilds[3].href = `./public/${course_name}/تفريغ وتشجير/${makeZeroNum(active_lesson+1, 3)}- تفريغ وتشجير - ${courses_data[course_name][active_lesson]["الإسم"]}.pdf`;
+            availableOptionsChilds[3].href = file_path("تفريغ وتشجير");
         }
         if(lesson_info["قراءة من الكتاب"] == true) {
             availableOptionsChilds[4].style.display = "";
-            availableOptionsChilds[4].href = `./public/${course_name}/تفريغ وتشجير/${makeZeroNum(active_lesson+1, 3)}- كتاب - ${courses_data[course_name][active_lesson]["الإسم"]}.pdf`;
+            availableOptionsChilds[4].href = file_path("كتاب");
         }
         if(lesson_info["ملخص مجمع"] == true) {
             availableOptionsChilds[6].style.display = "";
-            availableOptionsChilds[6].href = `./public/${course_name}/تفريغ وتشجير/${makeZeroNum(active_lesson+1, 3)}- ملخص مجمع - ${courses_data[course_name][active_lesson]["الإسم"]}.pdf`;
+            availableOptionsChilds[6].href = file_path("ملخص مجمع");
         }
         if(lesson_info["اختبار"] != null) {
             availableOptionsChilds[5].style.display = "";
@@ -94,8 +104,6 @@ let lessonsListChilds = lessonsList.querySelectorAll("div h1");
 let audio = document.querySelector("#lesson-player");
 let lessonPlayer = audio.querySelector("source");
 let theSpeed = document.querySelector(".voice-speed");
-
-document.querySelector("title").innerText = course_name;
 
 let courses_links = {
     "أساسيات الطريق إلى الله": "PL1i_D1Vw3d5NYUb87ULvvfMxV3yqWliBd",
@@ -1424,8 +1432,26 @@ let courses_data = {
     ]
 }
 
-// كتابة أسماء الدروس وتفعيل الدرس الحالي
+// اختيار الدورة والدرس من الرابط
 let active_lessons = JSON.parse(localStorage.getItem("active lessons info")); // obj[int]
+const params = new URLSearchParams(window.location.search);
+const course_param = params.get('course');
+const lesson_param = parseInt(params.get('lesson'));
+
+if(isNaN(course_param)) {
+    course_name = course_param;
+    localStorage.setItem("active course", course_param);
+}
+
+if(!isNaN(lesson_param)) {
+    active_lessons[course_name] = lesson_param-1;
+    localStorage.setItem("active lessons info", JSON.stringify(active_lessons));
+}
+
+// عنوان الصفحة
+document.querySelector("title").innerText = course_name;
+
+// كتابة أسماء الدروس وتفعيل الدرس الحالي
 let active_lesson = active_lessons[course_name];
 let courseVideosLinks = getVideoIds(courses_links[course_name], apiKey);
 let course_info = courses_data[course_name];
